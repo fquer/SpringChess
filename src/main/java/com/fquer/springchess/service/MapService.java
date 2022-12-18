@@ -57,8 +57,10 @@ public class MapService {
         moveableCoordinates.clear();
     }
 
-    public void addMoveableCoordinates(Coordinates coordinate) {
-        moveableCoordinates.add(coordinate);
+    public void addMoveableCoordinates(String coordinate) {
+        if (coordinate != "") {
+            moveableCoordinates.add(Coordinates.valueOf(coordinate));
+        }
     }
 
     public Coordinates getSelectedCoordinate() {

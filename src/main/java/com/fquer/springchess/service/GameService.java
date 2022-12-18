@@ -172,7 +172,13 @@ public class GameService {
 
             Piece moveToPiece = map.getPieceByCoordinate(Coordinates.valueOf(moveToCoordinate));
             map.setPieceCoordinate(Coordinates.valueOf(moveToCoordinate), map.getPieceByCoordinate(map.getSelectedCoordinate()));
-            map.setPieceCoordinate(map.getSelectedCoordinate(), moveToPiece);
+            if (moveToPiece.getPiece() == PieceEnum.Empty) {
+                map.setPieceCoordinate(map.getSelectedCoordinate(), moveToPiece);
+            }
+            else {
+                map.setPieceCoordinate(map.getSelectedCoordinate(), new Empty());
+            }
+
 
             // Tur degistirme
 
