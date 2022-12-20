@@ -9,7 +9,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 public class MapService {
-    private Hashtable<Coordinates, Piece> coordinates = new Hashtable();
+    private Hashtable<Coordinates, Piece> coordinates = new Hashtable<>();
     private ColorEnum turn = ColorEnum.White;
     private Coordinates selectedCoordinate;
     private List<Coordinates> moveableCoordinates = new ArrayList<>();

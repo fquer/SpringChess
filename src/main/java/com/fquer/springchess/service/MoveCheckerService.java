@@ -5,9 +5,9 @@ import com.fquer.springchess.model.enums.Coordinates;
 import com.fquer.springchess.model.enums.PieceEnum;
 import com.fquer.springchess.model.piece.Piece;
 
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 public class MoveCheckerService {
@@ -20,25 +20,24 @@ public class MoveCheckerService {
         this.map = map;
     }
     public void checkPieceMoveableCoordinates(String coordinate) {
-        map.clearMoveableCoordinates();
         Piece piece = map.getPieceByCoordinate(Coordinates.valueOf(coordinate));
         if (piece.getPiece() == PieceEnum.Pawn) {
             checkPawnMoveableCoordinate(piece, coordinate);
         }
         else if (piece.getPiece() == PieceEnum.Knight) {
-            checkKnightMoveableCoordinate(piece, coordinate);
+            checkKnightMoveableCoordinate(piece, coordinate, false);
         }
         else if (piece.getPiece() == PieceEnum.Bishop) {
-            checkBishopMoveableCoordinate(piece, coordinate);
+            checkBishopMoveableCoordinate(piece, coordinate, false);
         }
         else if (piece.getPiece() == PieceEnum.Rook) {
-            checkRookMoveableCoordinate(piece, coordinate);
+            checkRookMoveableCoordinate(piece, coordinate, false);
         }
         else if (piece.getPiece() == PieceEnum.Queen) {
-            checkQueenMoveableCoordinate(piece, coordinate);
+            checkQueenMoveableCoordinate(piece, coordinate, false);
         }
         else if (piece.getPiece() == PieceEnum.King) {
-            checkKingMoveableCoordinate(piece, coordinate);
+            checkKingMoveableCoordinate(piece, coordinate, false);
         }
     }
     private void checkPawnMoveableCoordinate(Piece piece, String coordinate) {
@@ -49,50 +48,7 @@ public class MoveCheckerService {
         else if (piece.getColour() == ColorEnum.Black) {
             pawnFixedCoordinates = pawnBlackFixedCoordinates;
         }
-
-        if (piece.getColour() == ColorEnum.Black) {
-            try {
-                if (map.getPieceByCoordinate(Coordinates.valueOf(labelAddition(coordinateAddition(coordinate, -1), -1))).getPiece() != PieceEnum.Empty &&
-                        map.getPieceByCoordinate(Coordinates.valueOf(labelAddition(coordinateAddition(coordinate, -1), -1))).getColour() != piece.getColour()) {
-                    map.addMoveableCoordinates(labelAddition(coordinateAddition(coordinate, -1), -1));
-                }
-            }
-            catch (Exception e) {
-                System.out.println(e);
-            }
-
-            try {
-                if (map.getPieceByCoordinate(Coordinates.valueOf(labelAddition(coordinateAddition(coordinate, -1), 1))).getPiece() != PieceEnum.Empty &&
-                        map.getPieceByCoordinate(Coordinates.valueOf(labelAddition(coordinateAddition(coordinate, -1), 1))).getColour() != piece.getColour()) {
-                    map.addMoveableCoordinates(labelAddition(coordinateAddition(coordinate, -1), 1));
-                }
-            }
-            catch (Exception e) {
-                System.out.println(e);
-            }
-        }
-        else {
-            try {
-                if (map.getPieceByCoordinate(Coordinates.valueOf(labelAddition(coordinateAddition(coordinate, 1), -1))).getPiece() != PieceEnum.Empty &&
-                        map.getPieceByCoordinate(Coordinates.valueOf(labelAddition(coordinateAddition(coordinate, 1), -1))).getColour() != piece.getColour()) {
-                    map.addMoveableCoordinates(labelAddition(coordinateAddition(coordinate, 1), -1));
-                }
-            }
-            catch (Exception e) {
-                System.out.println(e);
-            }
-
-            try {
-                if (map.getPieceByCoordinate(Coordinates.valueOf(labelAddition(coordinateAddition(coordinate, 1), 1))).getPiece() != PieceEnum.Empty &&
-                        map.getPieceByCoordinate(Coordinates.valueOf(labelAddition(coordinateAddition(coordinate, 1), 1))).getColour() != piece.getColour()) {
-                    map.addMoveableCoordinates(labelAddition(coordinateAddition(coordinate, 1), 1));
-                }
-            }
-            catch (Exception e) {
-                System.out.println(e);
-            }
-        }
-
+        checkPawnCornerMoveableCoordinate(piece, coordinate, false);
 
         if (pawnFixedCoordinates.contains(Coordinates.valueOf(coordinate))) {
             for (int i = 1; i <= 2; i++) {
@@ -128,14 +84,59 @@ public class MoveCheckerService {
         }
     }
 
-    private void checkKnightMoveableCoordinate(Piece piece, String coordinate) {
+    public void checkPawnCornerMoveableCoordinate(Piece piece, String coordinate, boolean forKing) {
+        if (piece.getColour() == ColorEnum.Black) {
+            try {
+                if (map.getPieceByCoordinate(Coordinates.valueOf(labelAddition(coordinateAddition(coordinate, -1), -1))).getPiece() != PieceEnum.Empty &&
+                        map.getPieceByCoordinate(Coordinates.valueOf(labelAddition(coordinateAddition(coordinate, -1), -1))).getColour() != piece.getColour() || forKing) {
+                    map.addMoveableCoordinates(labelAddition(coordinateAddition(coordinate, -1), -1));
+                }
+            }
+            catch (Exception e) {
+                System.out.println(e);
+            }
+
+            try {
+                if (map.getPieceByCoordinate(Coordinates.valueOf(labelAddition(coordinateAddition(coordinate, -1), 1))).getPiece() != PieceEnum.Empty &&
+                        map.getPieceByCoordinate(Coordinates.valueOf(labelAddition(coordinateAddition(coordinate, -1), 1))).getColour() != piece.getColour() || forKing) {
+                    map.addMoveableCoordinates(labelAddition(coordinateAddition(coordinate, -1), 1));
+                }
+            }
+            catch (Exception e) {
+                System.out.println(e);
+            }
+        }
+        else {
+            try {
+                if (map.getPieceByCoordinate(Coordinates.valueOf(labelAddition(coordinateAddition(coordinate, 1), -1))).getPiece() != PieceEnum.Empty &&
+                        map.getPieceByCoordinate(Coordinates.valueOf(labelAddition(coordinateAddition(coordinate, 1), -1))).getColour() != piece.getColour() || forKing) {
+                    map.addMoveableCoordinates(labelAddition(coordinateAddition(coordinate, 1), -1));
+                }
+            }
+            catch (Exception e) {
+                System.out.println(e);
+            }
+
+            try {
+                if (map.getPieceByCoordinate(Coordinates.valueOf(labelAddition(coordinateAddition(coordinate, 1), 1))).getPiece() != PieceEnum.Empty &&
+                        map.getPieceByCoordinate(Coordinates.valueOf(labelAddition(coordinateAddition(coordinate, 1), 1))).getColour() != piece.getColour() || forKing) {
+                    map.addMoveableCoordinates(labelAddition(coordinateAddition(coordinate, 1), 1));
+                }
+            }
+            catch (Exception e) {
+                System.out.println(e);
+            }
+        }
+    }
+
+    private void checkKnightMoveableCoordinate(Piece piece, String coordinate, boolean forKing) {
         for (int i = -2; i <= 2; i++) {
             if (i == 0) {
                 i++;
             }
             if (i == 1 || i == -1) {
                 try {
-                    if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, i), 2))).getColour() != piece.getColour()) {
+                    if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, i), 2))).getColour() != piece.getColour() || forKing) {
                         map.addMoveableCoordinates(coordinateAddition(labelAddition(coordinate, i), 2));
                     }
                 }
@@ -143,7 +144,7 @@ public class MoveCheckerService {
                     System.out.println(e);
                 }
                 try {
-                    if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, i), -2))).getColour() != piece.getColour()) {
+                    if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, i), -2))).getColour() != piece.getColour() || forKing) {
                         map.addMoveableCoordinates(coordinateAddition(labelAddition(coordinate, i), -2));
                     }
                 }
@@ -153,7 +154,7 @@ public class MoveCheckerService {
             }
             else if (i == 2 || i == -2) {
                 try {
-                    if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, i), 1))).getColour() != piece.getColour()) {
+                    if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, i), 1))).getColour() != piece.getColour() || forKing) {
                         map.addMoveableCoordinates(coordinateAddition(labelAddition(coordinate, i), 1));
                     }
                 }
@@ -161,7 +162,7 @@ public class MoveCheckerService {
                     System.out.println(e);
                 }
                 try {
-                    if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, i), -1))).getColour() != piece.getColour()) {
+                    if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, i), -1))).getColour() != piece.getColour() || forKing) {
                         map.addMoveableCoordinates(coordinateAddition(labelAddition(coordinate, i), -1));
                     }
                 }
@@ -172,7 +173,7 @@ public class MoveCheckerService {
         }
     }
 
-    public void checkBishopMoveableCoordinate(Piece piece, String coordinate) {
+    public void checkBishopMoveableCoordinate(Piece piece, String coordinate, boolean forKing) {
         boolean ff = true;
         boolean fb = true;
         boolean bf = true;
@@ -185,7 +186,7 @@ public class MoveCheckerService {
                         map.addMoveableCoordinates(coordinateAddition(labelAddition(coordinate, i * -1), i));
                     }
                     else {
-                        if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, i * -1), i))).getColour() != piece.getColour()) {
+                        if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, i * -1), i))).getColour() != piece.getColour() || forKing) {
                             map.addMoveableCoordinates(coordinateAddition(labelAddition(coordinate, i * -1), i));
                         }
                         bf = false;
@@ -204,7 +205,7 @@ public class MoveCheckerService {
                         map.addMoveableCoordinates(coordinateAddition(labelAddition(coordinate, i * -1), i * -1));
                     }
                     else {
-                        if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, i * -1), i * -1))).getColour() != piece.getColour()) {
+                        if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, i * -1), i * -1))).getColour() != piece.getColour() || forKing) {
                             map.addMoveableCoordinates(coordinateAddition(labelAddition(coordinate, i * -1), i * -1));
                         }
                         bb = false;
@@ -222,7 +223,7 @@ public class MoveCheckerService {
                         map.addMoveableCoordinates(coordinateAddition(labelAddition(coordinate, i), i));
                     }
                     else {
-                        if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, i), i))).getColour() != piece.getColour()) {
+                        if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, i), i))).getColour() != piece.getColour() || forKing) {
                             map.addMoveableCoordinates(coordinateAddition(labelAddition(coordinate, i), i));
                         }
                         ff = false;
@@ -240,7 +241,7 @@ public class MoveCheckerService {
                         map.addMoveableCoordinates(coordinateAddition(labelAddition(coordinate, i), i * -1));
                     }
                     else {
-                        if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, i), i * -1))).getColour() != piece.getColour()) {
+                        if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, i), i * -1))).getColour() != piece.getColour() || forKing) {
                             map.addMoveableCoordinates(coordinateAddition(labelAddition(coordinate, i), i * -1));
                         }
                         fb = false;
@@ -254,7 +255,7 @@ public class MoveCheckerService {
         }
     }
 
-    public void checkRookMoveableCoordinate(Piece piece, String coordinate) {
+    public void checkRookMoveableCoordinate(Piece piece, String coordinate, boolean forKing) {
         boolean f = true;
         boolean b = true;
         boolean r = true;
@@ -266,7 +267,7 @@ public class MoveCheckerService {
                         map.addMoveableCoordinates(coordinateAddition(coordinate, i));
                     }
                     else {
-                        if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(coordinate, i))).getColour() != piece.getColour()) {
+                        if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(coordinate, i))).getColour() != piece.getColour() || forKing) {
                             map.addMoveableCoordinates(coordinateAddition(coordinate, i));
                         }
                         f = false;
@@ -282,7 +283,7 @@ public class MoveCheckerService {
                         map.addMoveableCoordinates(coordinateAddition(coordinate, i * -1));
                     }
                     else {
-                        if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(coordinate, i * -1))).getColour() != piece.getColour()) {
+                        if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(coordinate, i * -1))).getColour() != piece.getColour() || forKing) {
                             map.addMoveableCoordinates(coordinateAddition(coordinate, i * -1));
                         }
                         b = false;
@@ -298,7 +299,7 @@ public class MoveCheckerService {
                         map.addMoveableCoordinates(labelAddition(coordinate, i));
                     }
                     else {
-                        if (map.getPieceByCoordinate(Coordinates.valueOf(labelAddition(coordinate, i))).getColour() != piece.getColour()) {
+                        if (map.getPieceByCoordinate(Coordinates.valueOf(labelAddition(coordinate, i))).getColour() != piece.getColour() || forKing) {
                             map.addMoveableCoordinates(labelAddition(coordinate, i));
                         }
                         r = false;
@@ -314,7 +315,7 @@ public class MoveCheckerService {
                         map.addMoveableCoordinates(labelAddition(coordinate, i * -1));
                     }
                     else {
-                        if (map.getPieceByCoordinate(Coordinates.valueOf(labelAddition(coordinate, i * -1))).getColour() != piece.getColour()) {
+                        if (map.getPieceByCoordinate(Coordinates.valueOf(labelAddition(coordinate, i * -1))).getColour() != piece.getColour() || forKing) {
                             map.addMoveableCoordinates(labelAddition(coordinate, i * -1));
                         }
                         l = false;
@@ -327,28 +328,111 @@ public class MoveCheckerService {
         }
     }
 
-    public void checkQueenMoveableCoordinate(Piece piece, String coordinate) {
-        checkRookMoveableCoordinate(piece, coordinate);
-        checkBishopMoveableCoordinate(piece, coordinate);
+    public void checkQueenMoveableCoordinate(Piece piece, String coordinate, boolean forKing) {
+        checkRookMoveableCoordinate(piece, coordinate, forKing);
+        checkBishopMoveableCoordinate(piece, coordinate, forKing);
     }
 
-    public void checkKingMoveableCoordinate(Piece piece, String coordinate) {
-        if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(coordinate, 1))).getColour() != piece.getColour())
-            map.addMoveableCoordinates(coordinateAddition(coordinate, 1));
-        if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(coordinate, -1))).getColour() != piece.getColour())
-            map.addMoveableCoordinates(coordinateAddition(coordinate, -1));
-        if (map.getPieceByCoordinate(Coordinates.valueOf(labelAddition(coordinate, -1))).getColour() != piece.getColour())
-            map.addMoveableCoordinates(labelAddition(coordinate, -1));
-        if (map.getPieceByCoordinate(Coordinates.valueOf(labelAddition(coordinate, 1))).getColour() != piece.getColour())
-            map.addMoveableCoordinates(labelAddition(coordinate, 1));
-        if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, 1), 1))).getColour() != piece.getColour())
-            map.addMoveableCoordinates(coordinateAddition(labelAddition(coordinate, 1), 1));
-        if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, 1), -1))).getColour() != piece.getColour())
-            map.addMoveableCoordinates(coordinateAddition(labelAddition(coordinate, 1), -1));
-        if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, -1), 1))).getColour() != piece.getColour())
-            map.addMoveableCoordinates(coordinateAddition(labelAddition(coordinate, -1), 1));
-        if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, -1), -1))).getColour() != piece.getColour())
-            map.addMoveableCoordinates(coordinateAddition(labelAddition(coordinate, -1), -1));
+    public void checkKingMoveableCoordinate(Piece piece, String coordinate, boolean forKing) {
+        List<Coordinates> kingCantMoveCoordinates = new ArrayList<>();
+        if (!forKing){
+            checkKingRiskPoints(piece);
+            kingCantMoveCoordinates.addAll(map.getMoveableCoordinates());
+            map.clearMoveableCoordinates();
+        }
+
+        try{
+            if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(coordinate, 1))).getColour() != piece.getColour() || forKing)
+                map.addMoveableCoordinates(coordinateAddition(coordinate, 1));
+        }
+        catch (Exception e) {
+
+        }
+        try{
+            if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(coordinate, -1))).getColour() != piece.getColour() || forKing)
+                map.addMoveableCoordinates(coordinateAddition(coordinate, -1));
+        }
+        catch (Exception e) {
+
+        }
+        try{
+            if (map.getPieceByCoordinate(Coordinates.valueOf(labelAddition(coordinate, -1))).getColour() != piece.getColour() || forKing)
+                map.addMoveableCoordinates(labelAddition(coordinate, -1));
+        }
+        catch (Exception e) {
+
+        }
+        try{
+            if (map.getPieceByCoordinate(Coordinates.valueOf(labelAddition(coordinate, 1))).getColour() != piece.getColour() || forKing)
+                map.addMoveableCoordinates(labelAddition(coordinate, 1));
+        }
+        catch (Exception e) {
+
+        }
+        try{
+            if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, 1), 1))).getColour() != piece.getColour()  || forKing)
+                map.addMoveableCoordinates(coordinateAddition(labelAddition(coordinate, 1), 1));
+        }
+        catch (Exception e) {
+
+        }
+        try{
+            if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, 1), -1))).getColour() != piece.getColour() || forKing)
+                map.addMoveableCoordinates(coordinateAddition(labelAddition(coordinate, 1), -1));
+        }
+        catch (Exception e) {
+
+        }
+        try{
+            if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, -1), 1))).getColour() != piece.getColour() || forKing)
+                map.addMoveableCoordinates(coordinateAddition(labelAddition(coordinate, -1), 1));
+        }
+        catch (Exception e) {
+
+        }
+        try{
+            if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, -1), -1))).getColour() != piece.getColour() || forKing)
+                map.addMoveableCoordinates(coordinateAddition(labelAddition(coordinate, -1), -1));
+        }
+        catch (Exception e) {
+
+        }
+        System.out.println("King cant move coordinates");
+        System.out.println(kingCantMoveCoordinates);
+        System.out.println("King default move coordinates");
+        System.out.println(map.getMoveableCoordinates());
+        kingCantMoveCoordinates.retainAll(map.getMoveableCoordinates());
+        System.out.println("King removed coordinates");
+        System.out.println(kingCantMoveCoordinates);
+        map.getMoveableCoordinates().removeAll(kingCantMoveCoordinates);
+        System.out.println("King can move coordinates");
+        System.out.println(map.getMoveableCoordinates());
+    }
+
+    public void checkKingRiskPoints(Piece piece) {
+        for (Coordinates i : Coordinates.values()) {
+            Piece tempPiece = map.getPieceByCoordinate(i);
+            if (tempPiece.getColour() != piece.getColour()) {
+                if (tempPiece.getPiece() == PieceEnum.Bishop) {
+                    checkBishopMoveableCoordinate(tempPiece, String.valueOf(i), true);
+                }
+                else if (tempPiece.getPiece() == PieceEnum.Pawn) {
+                    checkPawnCornerMoveableCoordinate(tempPiece, String.valueOf(i), true);
+                }
+                else if (tempPiece.getPiece() == PieceEnum.Knight) {
+                    checkKnightMoveableCoordinate(tempPiece, String.valueOf(i), true);
+                }
+                else if (tempPiece.getPiece() == PieceEnum.Rook) {
+                    checkRookMoveableCoordinate(tempPiece, String.valueOf(i), true);
+                }
+                else if (tempPiece.getPiece() == PieceEnum.Queen) {
+                    checkQueenMoveableCoordinate(tempPiece, String.valueOf(i), true);
+                }
+                else if (tempPiece.getPiece() == PieceEnum.King) {
+                    checkKingMoveableCoordinate(tempPiece, String.valueOf(i), true);
+                }
+            }
+        }
     }
 
     private char getCoordinateLabel(String coordinate) {

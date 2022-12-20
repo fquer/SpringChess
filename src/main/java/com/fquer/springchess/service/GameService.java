@@ -209,7 +209,7 @@ public class GameService {
         MapService map = game.getBoard();
         map.setSelectedCoordinate(Coordinates.valueOf(selectedCoordinate));
         MoveCheckerService moveCheckerService = new MoveCheckerService(map);
-
+        map.clearMoveableCoordinates();
         moveCheckerService.checkPieceMoveableCoordinates(selectedCoordinate);
 
         GameStorage.getInstance().setGame(game);
