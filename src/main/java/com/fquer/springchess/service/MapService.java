@@ -13,7 +13,11 @@ public class MapService {
     private ColorEnum turn = ColorEnum.White;
     private Coordinates selectedCoordinate;
     private List<Coordinates> moveableCoordinates = new ArrayList<>();
+    private List<Coordinates> kingCantMoveCoordinates = new ArrayList<>();
     private static MapService instance;
+
+    private Coordinates whiteKingCoordinate = Coordinates.E1;
+    private Coordinates blackKingCoordinate = Coordinates.E8;
 
     public static synchronized MapService getInstance() {
         if (instance == null) {
@@ -24,6 +28,10 @@ public class MapService {
 
     public Hashtable getMap(){
         return coordinates;
+    }
+
+    public void setMap(Hashtable<Coordinates, Piece> map) {
+        this.coordinates = map;
     }
 
     public void setPieceCoordinate(Coordinates coordinate, Piece piece){
@@ -69,5 +77,29 @@ public class MapService {
 
     public void setSelectedCoordinate(Coordinates selectedCoordinate) {
         this.selectedCoordinate = selectedCoordinate;
+    }
+
+    public List<Coordinates> getKingCantMoveCoordinates() {
+        return kingCantMoveCoordinates;
+    }
+
+    public void setKingCantMoveCoordinates(List<Coordinates> kingCantMoveCoordinates) {
+        this.kingCantMoveCoordinates = kingCantMoveCoordinates;
+    }
+
+    public Coordinates getWhiteKingCoordinate() {
+        return whiteKingCoordinate;
+    }
+
+    public void setWhiteKingCoordinate(Coordinates whiteKingCoordinate) {
+        this.whiteKingCoordinate = whiteKingCoordinate;
+    }
+
+    public Coordinates getBlackKingCoordinate() {
+        return blackKingCoordinate;
+    }
+
+    public void setBlackKingCoordinate(Coordinates blackKingCoordinate) {
+        this.blackKingCoordinate = blackKingCoordinate;
     }
 }

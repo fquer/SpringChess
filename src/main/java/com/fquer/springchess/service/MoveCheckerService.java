@@ -93,7 +93,7 @@ public class MoveCheckerService {
                 }
             }
             catch (Exception e) {
-                System.out.println(e);
+
             }
 
             try {
@@ -103,7 +103,7 @@ public class MoveCheckerService {
                 }
             }
             catch (Exception e) {
-                System.out.println(e);
+
             }
         }
         else {
@@ -114,7 +114,7 @@ public class MoveCheckerService {
                 }
             }
             catch (Exception e) {
-                System.out.println(e);
+
             }
 
             try {
@@ -124,7 +124,7 @@ public class MoveCheckerService {
                 }
             }
             catch (Exception e) {
-                System.out.println(e);
+
             }
         }
     }
@@ -141,7 +141,7 @@ public class MoveCheckerService {
                     }
                 }
                 catch (Exception e) {
-                    System.out.println(e);
+
                 }
                 try {
                     if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, i), -2))).getColour() != piece.getColour() || forKing) {
@@ -149,7 +149,7 @@ public class MoveCheckerService {
                     }
                 }
                 catch (Exception e) {
-                    System.out.println(e);
+
                 }
             }
             else if (i == 2 || i == -2) {
@@ -159,7 +159,7 @@ public class MoveCheckerService {
                     }
                 }
                 catch (Exception e) {
-                    System.out.println(e);
+
                 }
                 try {
                     if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, i), -1))).getColour() != piece.getColour() || forKing) {
@@ -167,7 +167,7 @@ public class MoveCheckerService {
                     }
                 }
                 catch (Exception e) {
-                    System.out.println(e);
+
                 }
             }
         }
@@ -179,7 +179,6 @@ public class MoveCheckerService {
         boolean bf = true;
         boolean bb = true;
         for (int i = 1; i <= 7; i++) {
-            System.out.println(i);
             try {
                 if (bf) {
                     if (map.getPieceByCoordinate(Coordinates.valueOf(coordinateAddition(labelAddition(coordinate, i * -1), i))).getPiece() == PieceEnum.Empty) {
@@ -195,7 +194,7 @@ public class MoveCheckerService {
 
             }
             catch (Exception e) {
-                System.out.println(e);
+
             }
 
 
@@ -214,7 +213,7 @@ public class MoveCheckerService {
 
             }
             catch (Exception e) {
-                System.out.println(e);
+
             }
 
             try {
@@ -232,7 +231,7 @@ public class MoveCheckerService {
 
             }
             catch (Exception e) {
-                System.out.println(e);
+
             }
 
             try {
@@ -250,7 +249,7 @@ public class MoveCheckerService {
 
             }
             catch (Exception e) {
-                System.out.println(e);
+
             }
         }
     }
@@ -337,8 +336,7 @@ public class MoveCheckerService {
         List<Coordinates> kingCantMoveCoordinates = new ArrayList<>();
         if (!forKing){
             checkKingRiskPoints(piece);
-            kingCantMoveCoordinates.addAll(map.getMoveableCoordinates());
-            map.clearMoveableCoordinates();
+            kingCantMoveCoordinates.addAll(map.getKingCantMoveCoordinates());
         }
 
         try{
@@ -397,16 +395,18 @@ public class MoveCheckerService {
         catch (Exception e) {
 
         }
-        System.out.println("King cant move coordinates");
-        System.out.println(kingCantMoveCoordinates);
-        System.out.println("King default move coordinates");
-        System.out.println(map.getMoveableCoordinates());
-        kingCantMoveCoordinates.retainAll(map.getMoveableCoordinates());
-        System.out.println("King removed coordinates");
-        System.out.println(kingCantMoveCoordinates);
-        map.getMoveableCoordinates().removeAll(kingCantMoveCoordinates);
-        System.out.println("King can move coordinates");
-        System.out.println(map.getMoveableCoordinates());
+        if (!forKing) {
+            System.out.println("King cant move coordinates");
+            System.out.println(map.getKingCantMoveCoordinates());
+            System.out.println("King default move coordinates");
+            System.out.println(map.getMoveableCoordinates());
+            kingCantMoveCoordinates.retainAll(map.getMoveableCoordinates());
+            System.out.println("King removed coordinates");
+            System.out.println(kingCantMoveCoordinates);
+            map.getMoveableCoordinates().removeAll(kingCantMoveCoordinates);
+            System.out.println("King can move coordinates");
+            System.out.println(map.getMoveableCoordinates());
+        }
     }
 
     public void checkKingRiskPoints(Piece piece) {
@@ -433,6 +433,9 @@ public class MoveCheckerService {
                 }
             }
         }
+        map.getKingCantMoveCoordinates().clear();
+        map.getKingCantMoveCoordinates().addAll(map.getMoveableCoordinates());
+        map.clearMoveableCoordinates();
     }
 
     private char getCoordinateLabel(String coordinate) {
@@ -448,7 +451,6 @@ public class MoveCheckerService {
             return String.valueOf(coordinateLabels.get(coordinateLabels.indexOf(getCoordinateLabel(coordinate)) + number)) + getCoordinateNumber(coordinate);
         }
         catch (Exception e) {
-            System.out.println(e);
             return "";
         }
     }
@@ -462,7 +464,6 @@ public class MoveCheckerService {
             }
         }
         catch (Exception e) {
-            System.out.println(e);
             return "";
         }
     }

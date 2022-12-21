@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.security.InvalidParameterException;
+import java.util.Hashtable;
 
 @Service
 @AllArgsConstructor
@@ -162,14 +163,16 @@ public class GameService {
 
         Game game = GameStorage.getInstance().getGame();
         MapService map = game.getBoard();
+        MoveCheckerService moveCheckerService = new MoveCheckerService(map);
 
-        if (map.getPieceByCoordinate(map.getSelectedCoordinate()).getPiece() == PieceEnum.Empty) {
+        Piece selectedPiece = map.getPieceByCoordinate(map.getSelectedCoordinate());
+        if (selectedPiece.getPiece() == PieceEnum.Empty) {
             throw new InvalidParameterException("Cant select empty area!");
         }
 
         if ((map.getTurn() == ColorEnum.White && player.getLogin().equals(game.getPlayer1().getLogin())) ||
             (map.getTurn() == ColorEnum.Black && player.getLogin().equals(game.getPlayer2().getLogin()))) {
-
+            Hashtable tempMap = map.getMap();
             Piece moveToPiece = map.getPieceByCoordinate(Coordinates.valueOf(moveToCoordinate));
             map.setPieceCoordinate(Coordinates.valueOf(moveToCoordinate), map.getPieceByCoordinate(map.getSelectedCoordinate()));
             if (moveToPiece.getPiece() == PieceEnum.Empty) {
@@ -179,6 +182,30 @@ public class GameService {
                 map.setPieceCoordinate(map.getSelectedCoordinate(), new Empty());
             }
 
+            moveCheckerService.checkKingRiskPoints(selectedPiece);
+            System.out.println("Cant move area");
+            System.out.println(map.getKingCantMoveCoordinates());
+
+            if(selectedPiece.getColour() == ColorEnum.White && map.getKingCantMoveCoordinates().contains(map.getWhiteKingCoordinate())) {
+                System.out.println("Gecersiz hamle.");
+                map.setMap(tempMap);
+            }
+            else {
+                if(selectedPiece.getPiece() == PieceEnum.King && selectedPiece.getColour() == ColorEnum.White) {
+                    map.setWhiteKingCoordinate(Coordinates.valueOf(moveToCoordinate));
+                }
+                else if (selectedPiece.getPiece() == PieceEnum.King && selectedPiece.getColour() == ColorEnum.Black) {
+                    map.setBlackKingCoordinate(Coordinates.valueOf(moveToCoordinate));
+                }
+            }
+
+
+
+
+            System.out.println("White king coordinate");
+            System.out.println(map.getWhiteKingCoordinate());
+            System.out.println("Black king coordinate");
+            System.out.println(map.getBlackKingCoordinate());
 
             // Tur degistirme
 
