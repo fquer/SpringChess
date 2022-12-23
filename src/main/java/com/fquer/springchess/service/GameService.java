@@ -12,7 +12,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -186,18 +188,14 @@ public class GameService {
             System.out.println("Cant move area");
             System.out.println(map.getKingCantMoveCoordinates());
 
-            if(selectedPiece.getColour() == ColorEnum.White && map.getKingCantMoveCoordinates().contains(map.getWhiteKingCoordinate())) {
-                System.out.println("Gecersiz hamle.");
-                map.setMap(tempMap);
+
+            if(selectedPiece.getPiece() == PieceEnum.King && selectedPiece.getColour() == ColorEnum.White) {
+                map.setWhiteKingCoordinate(Coordinates.valueOf(moveToCoordinate));
             }
-            else {
-                if(selectedPiece.getPiece() == PieceEnum.King && selectedPiece.getColour() == ColorEnum.White) {
-                    map.setWhiteKingCoordinate(Coordinates.valueOf(moveToCoordinate));
-                }
-                else if (selectedPiece.getPiece() == PieceEnum.King && selectedPiece.getColour() == ColorEnum.Black) {
-                    map.setBlackKingCoordinate(Coordinates.valueOf(moveToCoordinate));
-                }
+            else if (selectedPiece.getPiece() == PieceEnum.King && selectedPiece.getColour() == ColorEnum.Black) {
+                map.setBlackKingCoordinate(Coordinates.valueOf(moveToCoordinate));
             }
+
 
 
 
@@ -238,6 +236,7 @@ public class GameService {
         MoveCheckerService moveCheckerService = new MoveCheckerService(map);
         map.clearMoveableCoordinates();
         moveCheckerService.checkPieceMoveableCoordinates(selectedCoordinate);
+        moveCheckerService.checkPieceCantMoveCoordinates(selectedCoordinate);
 
         GameStorage.getInstance().setGame(game);
         return game;

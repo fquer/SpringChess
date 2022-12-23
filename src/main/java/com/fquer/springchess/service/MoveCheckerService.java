@@ -3,12 +3,10 @@ package com.fquer.springchess.service;
 import com.fquer.springchess.model.enums.ColorEnum;
 import com.fquer.springchess.model.enums.Coordinates;
 import com.fquer.springchess.model.enums.PieceEnum;
+import com.fquer.springchess.model.piece.Empty;
 import com.fquer.springchess.model.piece.Piece;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class MoveCheckerService {
     private MapService map;
@@ -410,6 +408,7 @@ public class MoveCheckerService {
     }
 
     public void checkKingRiskPoints(Piece piece) {
+        map.clearMoveableCoordinates();
         for (Coordinates i : Coordinates.values()) {
             Piece tempPiece = map.getPieceByCoordinate(i);
             if (tempPiece.getColour() != piece.getColour()) {
@@ -436,6 +435,45 @@ public class MoveCheckerService {
         map.getKingCantMoveCoordinates().clear();
         map.getKingCantMoveCoordinates().addAll(map.getMoveableCoordinates());
         map.clearMoveableCoordinates();
+    }
+
+    public void checkPieceCantMoveCoordinates(String selectedCoordinate) {
+        Piece piece = map.getPieceByCoordinate(Coordinates.valueOf(selectedCoordinate));
+
+        System.out.println(piece.getPiece() + " moveable coordinates:");
+        System.out.println(map.getMoveableCoordinates());
+        List<Coordinates> clearedCoordinates = new ArrayList<>(map.getMoveableCoordinates());
+        List<Coordinates> tempCoordinates = new ArrayList<>(map.getMoveableCoordinates());
+
+
+        checkKingRiskPoints(piece);
+        System.out.println("King risk points");
+        System.out.println(map.getKingCantMoveCoordinates());
+
+        for(Coordinates moveableCoordinate: tempCoordinates) {
+            Hashtable tempMap = (Hashtable) map.getMap().clone();
+            map.setPieceCoordinate(moveableCoordinate, piece);
+            if (map.getPieceByCoordinate(moveableCoordinate).getPiece() == PieceEnum.Empty) {
+                map.setPieceCoordinate(Coordinates.valueOf(selectedCoordinate), map.getPieceByCoordinate(moveableCoordinate));
+            }
+            else {
+                map.setPieceCoordinate(Coordinates.valueOf(selectedCoordinate), new Empty());
+            }
+            System.out.println("King risk points for " + moveableCoordinate);
+            checkKingRiskPoints(piece);
+            System.out.println(map.getKingCantMoveCoordinates());
+
+            if (map.getKingCantMoveCoordinates().contains(map.getWhiteKingCoordinate()) && piece.getColour() == ColorEnum.White) {
+                clearedCoordinates.remove(moveableCoordinate);
+            }
+            else if (map.getKingCantMoveCoordinates().contains(map.getBlackKingCoordinate()) && piece.getColour() == ColorEnum.Black) {
+                clearedCoordinates.remove(moveableCoordinate);
+            }
+
+            map.setMap(tempMap);
+        }
+
+        map.getMoveableCoordinates().addAll(clearedCoordinates);
     }
 
     private char getCoordinateLabel(String coordinate) {
