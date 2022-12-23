@@ -1,4 +1,4 @@
-package com.fquer.springchess.model.rto;
+package com.fquer.springchess.model.dto;
 
 import com.fquer.springchess.service.MapService;
 import lombok.Data;

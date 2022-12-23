@@ -1,10 +1,10 @@
 package com.fquer.springchess.controller;
 
-import com.fquer.springchess.controller.dto.ConnectRequest;
-import com.fquer.springchess.model.rto.Game;
-import com.fquer.springchess.model.rto.GamePlay;
-import com.fquer.springchess.model.rto.Logins;
-import com.fquer.springchess.model.rto.Player;
+import com.fquer.springchess.model.dto.ConnectRequest;
+import com.fquer.springchess.model.dto.Game;
+import com.fquer.springchess.model.dto.GamePlay;
+import com.fquer.springchess.model.dto.Logins;
+import com.fquer.springchess.model.dto.Player;
 import com.fquer.springchess.service.GameService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

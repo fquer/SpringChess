@@ -4,17 +4,15 @@ import com.fquer.springchess.model.enums.ColorEnum;
 import com.fquer.springchess.model.enums.Coordinates;
 import com.fquer.springchess.model.enums.PieceEnum;
 import com.fquer.springchess.model.piece.*;
-import com.fquer.springchess.model.rto.Game;
-import com.fquer.springchess.model.rto.Logins;
-import com.fquer.springchess.model.rto.Player;
+import com.fquer.springchess.model.dto.Game;
+import com.fquer.springchess.model.dto.Logins;
+import com.fquer.springchess.model.dto.Player;
 import com.fquer.springchess.storage.GameStorage;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.security.InvalidParameterException;
-import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.List;
 
 @Service
 @AllArgsConstructor

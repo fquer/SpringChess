@@ -1,6 +1,6 @@
 package com.fquer.springchess.storage;
 
-import com.fquer.springchess.model.rto.Game;
+import com.fquer.springchess.model.dto.Game;
 
 public class GameStorage {
     private static Game game;
