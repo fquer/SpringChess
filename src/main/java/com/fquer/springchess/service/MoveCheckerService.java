@@ -444,7 +444,8 @@ public class MoveCheckerService {
         System.out.println(map.getMoveableCoordinates());
         List<Coordinates> clearedCoordinates = new ArrayList<>(map.getMoveableCoordinates());
         List<Coordinates> tempCoordinates = new ArrayList<>(map.getMoveableCoordinates());
-
+        Coordinates tempWhiteKingCoordinate = map.getWhiteKingCoordinate();
+        Coordinates tempBlackKingCoordinate = map.getBlackKingCoordinate();
 
         checkKingRiskPoints(piece.getColour());
         System.out.println("King risk points");
@@ -459,6 +460,14 @@ public class MoveCheckerService {
             else {
                 map.setPieceCoordinate(Coordinates.valueOf(selectedCoordinate), new Empty());
             }
+
+            if(map.getPieceByCoordinate(moveableCoordinate).getPiece() == PieceEnum.King && map.getPieceByCoordinate(moveableCoordinate).getColour() == ColorEnum.White) {
+                map.setWhiteKingCoordinate(moveableCoordinate);
+            }
+            else if (map.getPieceByCoordinate(moveableCoordinate).getPiece() == PieceEnum.King && map.getPieceByCoordinate(moveableCoordinate).getColour() == ColorEnum.Black) {
+                map.setBlackKingCoordinate(moveableCoordinate);
+            }
+
             System.out.println("King risk points for " + moveableCoordinate);
             checkKingRiskPoints(piece.getColour());
             System.out.println(map.getKingCantMoveCoordinates());
@@ -471,16 +480,19 @@ public class MoveCheckerService {
             }
 
             map.setMap(tempMap);
+            map.setWhiteKingCoordinate(tempWhiteKingCoordinate);
+            map.setBlackKingCoordinate(tempBlackKingCoordinate);
         }
 
         map.getMoveableCoordinates().addAll(clearedCoordinates);
     }
 
-    public void checkMateStatus(Piece piece) {
+    public void checkMateStatus(ColorEnum color) {
+        map.setCheckStatus(true);
         List<Coordinates> saverCoordinates = new ArrayList<>();
         for (Coordinates i : Coordinates.values()) {
             Piece tempPiece = map.getPieceByCoordinate(i);
-            if (tempPiece.getColour() != piece.getColour() && tempPiece.getPiece() != PieceEnum.Empty) {
+            if (tempPiece.getColour() == color && tempPiece.getPiece() != PieceEnum.Empty) {
                 checkPieceMoveableCoordinates(String.valueOf(i));
                 checkPieceCantMoveCoordinates(String.valueOf(i));
                 saverCoordinates.addAll(map.getMoveableCoordinates());
@@ -490,7 +502,8 @@ public class MoveCheckerService {
         System.out.println(saverCoordinates);
         if (saverCoordinates.isEmpty()) {
             System.out.println("Oyun bitti");
-            System.out.println(piece.getColour() + " Kazandi");
+            System.out.println(((color == ColorEnum.White) ? ColorEnum.Black : ColorEnum.White) + " Kazandi");
+            map.setWinner(((color == ColorEnum.White) ? ColorEnum.Black : ColorEnum.White));
         }
     }
     private char getCoordinateLabel(String coordinate) {

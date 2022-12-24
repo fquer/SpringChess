@@ -1,5 +1,6 @@
 package com.fquer.springchess.service;
 
+import com.fquer.springchess.model.dto.GamePlayDb;
 import com.fquer.springchess.model.enums.ColorEnum;
 import com.fquer.springchess.model.enums.Coordinates;
 import com.fquer.springchess.model.enums.PieceEnum;
@@ -7,8 +8,10 @@ import com.fquer.springchess.model.piece.*;
 import com.fquer.springchess.model.dto.Game;
 import com.fquer.springchess.model.dto.Logins;
 import com.fquer.springchess.model.dto.Player;
+import com.fquer.springchess.repository.GamePlayRepository;
 import com.fquer.springchess.storage.GameStorage;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.InvalidParameterException;
@@ -17,6 +20,8 @@ import java.util.Hashtable;
 @Service
 @AllArgsConstructor
 public class GameService {
+    @Autowired
+    private GamePlayRepository gamePlayRepository;
     private final PieceFactory pieceFactory = new PieceFactory();
 
     private boolean checkStatement(Coordinates coordinate, PieceEnum piece, ColorEnum color){
@@ -175,6 +180,14 @@ public class GameService {
             Hashtable tempMap = map.getMap();
             Piece moveToPiece = map.getPieceByCoordinate(Coordinates.valueOf(moveToCoordinate));
             map.setPieceCoordinate(Coordinates.valueOf(moveToCoordinate), map.getPieceByCoordinate(map.getSelectedCoordinate()));
+
+            GamePlayDb gamePlayDb = new GamePlayDb();
+            gamePlayDb.setGameId("123");
+            gamePlayDb.setPlayer(player.getLogin());
+            gamePlayDb.setSelectedCoordinate(String.valueOf(map.getSelectedCoordinate()));
+            gamePlayDb.setMoveToCoordinate(moveToCoordinate);
+            gamePlayRepository.save(gamePlayDb);
+
             if (moveToPiece.getPiece() == PieceEnum.Empty) {
                 map.setPieceCoordinate(map.getSelectedCoordinate(), moveToPiece);
             }
@@ -207,11 +220,14 @@ public class GameService {
 
             if (map.getTurn() == ColorEnum.Black && map.getKingCantMoveCoordinates().contains(map.getWhiteKingCoordinate())) {
                 System.out.println("Beyaza Sah cekildi!");
-                moveCheckerService.checkMateStatus(selectedPiece);
+                moveCheckerService.checkMateStatus(ColorEnum.White);
             }
             else if (map.getTurn() == ColorEnum.White && map.getKingCantMoveCoordinates().contains(map.getBlackKingCoordinate())) {
                 System.out.println("Siyaha Sah cekildi!");
-                moveCheckerService.checkMateStatus(selectedPiece);
+                moveCheckerService.checkMateStatus(ColorEnum.Black);
+            }
+            else {
+                map.setCheckStatus(false);
             }
 
 

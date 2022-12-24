@@ -15,7 +15,8 @@ public class MapService {
     private List<Coordinates> moveableCoordinates = new ArrayList<>();
     private List<Coordinates> kingCantMoveCoordinates = new ArrayList<>();
     private static MapService instance;
-
+    private ColorEnum winner = ColorEnum.Empty;
+    private boolean checkStatus = false;
     private Coordinates whiteKingCoordinate = Coordinates.E1;
     private Coordinates blackKingCoordinate = Coordinates.E8;
 
@@ -101,5 +102,21 @@ public class MapService {
 
     public void setBlackKingCoordinate(Coordinates blackKingCoordinate) {
         this.blackKingCoordinate = blackKingCoordinate;
+    }
+
+    public void setWinner(ColorEnum winner) {
+        this.winner = winner;
+    }
+
+    public ColorEnum getWinner() {
+        return winner;
+    }
+
+    public boolean isCheckStatus() {
+        return checkStatus;
+    }
+
+    public void setCheckStatus(boolean checkStatus) {
+        this.checkStatus = checkStatus;
     }
 }
