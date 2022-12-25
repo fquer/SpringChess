@@ -1,27 +1,29 @@
 package com.fquer.springchess.service;
 
-import com.fquer.springchess.model.dto.GamePlayDb;
+import com.fquer.springchess.model.dto.*;
 import com.fquer.springchess.model.enums.ColorEnum;
 import com.fquer.springchess.model.enums.Coordinates;
 import com.fquer.springchess.model.enums.PieceEnum;
 import com.fquer.springchess.model.piece.*;
-import com.fquer.springchess.model.dto.Game;
-import com.fquer.springchess.model.dto.Logins;
-import com.fquer.springchess.model.dto.Player;
 import com.fquer.springchess.repository.GamePlayRepository;
+import com.fquer.springchess.repository.GameRepository;
 import com.fquer.springchess.storage.GameStorage;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.InvalidParameterException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Hashtable;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
 public class GameService {
     @Autowired
     private GamePlayRepository gamePlayRepository;
+    private GameRepository gameRepository;
     private final PieceFactory pieceFactory = new PieceFactory();
 
     private boolean checkStatement(Coordinates coordinate, PieceEnum piece, ColorEnum color){
@@ -88,6 +90,7 @@ public class GameService {
         if (GameStorage.getInstance().getGame() == null) {
             Game game = new Game();
             MapService map = new MapService();
+            game.setGameId(UUID.randomUUID().toString());
             game.setBoard(map);
             if (player.getColor() == ColorEnum.White) {
                 game.setPlayer1(player);
@@ -122,6 +125,15 @@ public class GameService {
         else {
             throw new InvalidParameterException("Player slot is not empty");
         }
+
+        GameDb gameDb = new GameDb();
+        gameDb.setGameId(game.getGameId());
+        gameDb.setPlayer1(game.getPlayer1().getLogin());
+        gameDb.setPlayer2(game.getPlayer2().getLogin());
+        gameDb.setWinner("Empty");
+        gameDb.setCreateDate(new Date());
+        gameDb.setFinishDate(null);
+        gameRepository.save(gameDb);
 
         GameStorage.getInstance().setGame(game);
         return game;
@@ -168,7 +180,7 @@ public class GameService {
 
         Game game = GameStorage.getInstance().getGame();
         MapService map = game.getBoard();
-        MoveCheckerService moveCheckerService = new MoveCheckerService(map);
+        MoveCheckerService moveCheckerService = new MoveCheckerService(map, gameRepository);
 
         Piece selectedPiece = map.getPieceByCoordinate(map.getSelectedCoordinate());
         if (selectedPiece.getPiece() == PieceEnum.Empty) {
@@ -182,7 +194,7 @@ public class GameService {
             map.setPieceCoordinate(Coordinates.valueOf(moveToCoordinate), map.getPieceByCoordinate(map.getSelectedCoordinate()));
 
             GamePlayDb gamePlayDb = new GamePlayDb();
-            gamePlayDb.setGameId("123");
+            gamePlayDb.setGameId(game.getGameId());
             gamePlayDb.setPlayer(player.getLogin());
             gamePlayDb.setSelectedCoordinate(String.valueOf(map.getSelectedCoordinate()));
             gamePlayDb.setMoveToCoordinate(moveToCoordinate);
@@ -220,11 +232,11 @@ public class GameService {
 
             if (map.getTurn() == ColorEnum.Black && map.getKingCantMoveCoordinates().contains(map.getWhiteKingCoordinate())) {
                 System.out.println("Beyaza Sah cekildi!");
-                moveCheckerService.checkMateStatus(ColorEnum.White);
+                moveCheckerService.checkMateStatus(ColorEnum.White, game.getGameId());
             }
             else if (map.getTurn() == ColorEnum.White && map.getKingCantMoveCoordinates().contains(map.getBlackKingCoordinate())) {
                 System.out.println("Siyaha Sah cekildi!");
-                moveCheckerService.checkMateStatus(ColorEnum.Black);
+                moveCheckerService.checkMateStatus(ColorEnum.Black, game.getGameId());
             }
             else {
                 map.setCheckStatus(false);
@@ -261,7 +273,7 @@ public class GameService {
         if ((map.getTurn() == ColorEnum.White && player.getLogin().equals(game.getPlayer1().getLogin())) && map.getPieceByCoordinate(Coordinates.valueOf(selectedCoordinate)).getColour() == player.getColor() ||
             (map.getTurn() == ColorEnum.Black && player.getLogin().equals(game.getPlayer2().getLogin())  && map.getPieceByCoordinate(Coordinates.valueOf(selectedCoordinate)).getColour() == player.getColor() )) {
             map.setSelectedCoordinate(Coordinates.valueOf(selectedCoordinate));
-            MoveCheckerService moveCheckerService = new MoveCheckerService(map);
+            MoveCheckerService moveCheckerService = new MoveCheckerService(map, gameRepository);
             map.clearMoveableCoordinates();
             moveCheckerService.checkPieceMoveableCoordinates(selectedCoordinate);
             moveCheckerService.checkPieceCantMoveCoordinates(selectedCoordinate);

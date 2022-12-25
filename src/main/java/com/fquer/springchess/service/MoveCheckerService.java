@@ -1,21 +1,27 @@
 package com.fquer.springchess.service;
 
+import com.fquer.springchess.model.dto.GameDb;
 import com.fquer.springchess.model.enums.ColorEnum;
 import com.fquer.springchess.model.enums.Coordinates;
 import com.fquer.springchess.model.enums.PieceEnum;
 import com.fquer.springchess.model.piece.Empty;
 import com.fquer.springchess.model.piece.Piece;
+import com.fquer.springchess.repository.GamePlayRepository;
+import com.fquer.springchess.repository.GameRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
 public class MoveCheckerService {
+    private GameRepository gameRepository;
     private MapService map;
     private final List<Character> coordinateLabels = Arrays.asList('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H');
     private final List<Coordinates> pawnWhiteFixedCoordinates = Arrays.asList(Coordinates.A2, Coordinates.B2, Coordinates.C2, Coordinates.D2, Coordinates.E2, Coordinates.F2, Coordinates.G2, Coordinates.H2);
     private final List<Coordinates> pawnBlackFixedCoordinates = Arrays.asList(Coordinates.A7, Coordinates.B7, Coordinates.C7, Coordinates.D7, Coordinates.E7, Coordinates.F7, Coordinates.G7, Coordinates.H7);
 
-    public MoveCheckerService(MapService map) {
+    public MoveCheckerService(MapService map, GameRepository gameRepository) {
         this.map = map;
+        this.gameRepository = gameRepository;
     }
     public void checkPieceMoveableCoordinates(String coordinate) {
         Piece piece = map.getPieceByCoordinate(Coordinates.valueOf(coordinate));
@@ -487,7 +493,7 @@ public class MoveCheckerService {
         map.getMoveableCoordinates().addAll(clearedCoordinates);
     }
 
-    public void checkMateStatus(ColorEnum color) {
+    public void checkMateStatus(ColorEnum color, String gameId) {
         map.setCheckStatus(true);
         List<Coordinates> saverCoordinates = new ArrayList<>();
         for (Coordinates i : Coordinates.values()) {
@@ -502,8 +508,22 @@ public class MoveCheckerService {
         System.out.println(saverCoordinates);
         if (saverCoordinates.isEmpty()) {
             System.out.println("Oyun bitti");
-            System.out.println(((color == ColorEnum.White) ? ColorEnum.Black : ColorEnum.White) + " Kazandi");
-            map.setWinner(((color == ColorEnum.White) ? ColorEnum.Black : ColorEnum.White));
+            ColorEnum winner = ((color == ColorEnum.White) ? ColorEnum.Black : ColorEnum.White);
+            System.out.println(winner + " Kazandi");
+            map.setWinner(winner);
+
+            Optional<GameDb> gameDb = Optional.ofNullable(gameRepository.findByGameId(gameId));
+            if(gameDb.isPresent()){
+                GameDb foundGameDb = gameDb.get();
+                System.out.println("Db cekilen bilgiler:");
+                System.out.println(foundGameDb.getGameId());
+                System.out.println(foundGameDb.getPlayer1());
+                System.out.println(foundGameDb.getPlayer2());
+                System.out.println(foundGameDb.getWinner());
+                foundGameDb.setWinner(String.valueOf(winner));
+                foundGameDb.setFinishDate(new java.util.Date(System.currentTimeMillis()));
+                gameRepository.save(foundGameDb);
+            }
         }
     }
     private char getCoordinateLabel(String coordinate) {
