@@ -11,13 +11,12 @@ import org.springframework.data.annotation.Id;
 @Data
 public class GamePlayDb {
     @jakarta.persistence.Id
-    @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
 
     private String id;
-
     private String gameId;
     private String player;
+    private String moveOrder;
     private String selectedCoordinate;
     private String moveToCoordinate;
 

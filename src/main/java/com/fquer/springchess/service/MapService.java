@@ -19,6 +19,7 @@ public class MapService {
     private boolean checkStatus = false;
     private Coordinates whiteKingCoordinate = Coordinates.E1;
     private Coordinates blackKingCoordinate = Coordinates.E8;
+    private Integer moveOrder = 0;
 
     public static synchronized MapService getInstance() {
         if (instance == null) {
@@ -118,5 +119,13 @@ public class MapService {
 
     public void setCheckStatus(boolean checkStatus) {
         this.checkStatus = checkStatus;
+    }
+
+    public Integer getMoveOrder() {
+        return moveOrder;
+    }
+
+    public void moveOrderIncrement() {
+        this.moveOrder += 1;
     }
 }

@@ -15,7 +15,6 @@ import java.util.Date;
 public class GameDb {
 
     @jakarta.persistence.Id
-    @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
 
     private String id;

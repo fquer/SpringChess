@@ -126,20 +126,15 @@ public class GameService {
             throw new InvalidParameterException("Player slot is not empty");
         }
 
-        GameDb gameDb = new GameDb();
-        gameDb.setGameId(game.getGameId());
-        gameDb.setPlayer1(game.getPlayer1().getLogin());
-        gameDb.setPlayer2(game.getPlayer2().getLogin());
-        gameDb.setWinner("Empty");
-        gameDb.setCreateDate(new Date());
-        gameDb.setFinishDate(null);
-        gameRepository.save(gameDb);
+        DatabaseService databaseService = DatabaseService.getInstance();
+        databaseService.createGame(game.getGameId(), game.getPlayer1().getLogin(), game.getPlayer2().getLogin());
 
         GameStorage.getInstance().setGame(game);
         return game;
     }
 
     public Game gameStatus(Player player) {
+        DatabaseService.getInstance().setRepositories(gameRepository, gamePlayRepository);
         if (GameStorage.getInstance().getGame() == null) {
             return new Game();
         }
@@ -180,7 +175,7 @@ public class GameService {
 
         Game game = GameStorage.getInstance().getGame();
         MapService map = game.getBoard();
-        MoveCheckerService moveCheckerService = new MoveCheckerService(map, gameRepository);
+        MoveCheckerService moveCheckerService = new MoveCheckerService(map);
 
         Piece selectedPiece = map.getPieceByCoordinate(map.getSelectedCoordinate());
         if (selectedPiece.getPiece() == PieceEnum.Empty) {
@@ -189,16 +184,12 @@ public class GameService {
 
         if ((map.getTurn() == ColorEnum.White && player.getLogin().equals(game.getPlayer1().getLogin())) ||
             (map.getTurn() == ColorEnum.Black && player.getLogin().equals(game.getPlayer2().getLogin()))) {
-            Hashtable tempMap = map.getMap();
             Piece moveToPiece = map.getPieceByCoordinate(Coordinates.valueOf(moveToCoordinate));
             map.setPieceCoordinate(Coordinates.valueOf(moveToCoordinate), map.getPieceByCoordinate(map.getSelectedCoordinate()));
+            map.moveOrderIncrement();
 
-            GamePlayDb gamePlayDb = new GamePlayDb();
-            gamePlayDb.setGameId(game.getGameId());
-            gamePlayDb.setPlayer(player.getLogin());
-            gamePlayDb.setSelectedCoordinate(String.valueOf(map.getSelectedCoordinate()));
-            gamePlayDb.setMoveToCoordinate(moveToCoordinate);
-            gamePlayRepository.save(gamePlayDb);
+            DatabaseService databaseService = DatabaseService.getInstance();
+            databaseService.addGamePlay(game.getGameId(), player.getLogin(), String.valueOf(map.getSelectedCoordinate()), moveToCoordinate, String.valueOf(map.getMoveOrder()) );
 
             if (moveToPiece.getPiece() == PieceEnum.Empty) {
                 map.setPieceCoordinate(map.getSelectedCoordinate(), moveToPiece);
@@ -273,7 +264,7 @@ public class GameService {
         if ((map.getTurn() == ColorEnum.White && player.getLogin().equals(game.getPlayer1().getLogin())) && map.getPieceByCoordinate(Coordinates.valueOf(selectedCoordinate)).getColour() == player.getColor() ||
             (map.getTurn() == ColorEnum.Black && player.getLogin().equals(game.getPlayer2().getLogin())  && map.getPieceByCoordinate(Coordinates.valueOf(selectedCoordinate)).getColour() == player.getColor() )) {
             map.setSelectedCoordinate(Coordinates.valueOf(selectedCoordinate));
-            MoveCheckerService moveCheckerService = new MoveCheckerService(map, gameRepository);
+            MoveCheckerService moveCheckerService = new MoveCheckerService(map);
             map.clearMoveableCoordinates();
             moveCheckerService.checkPieceMoveableCoordinates(selectedCoordinate);
             moveCheckerService.checkPieceCantMoveCoordinates(selectedCoordinate);
