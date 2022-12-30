@@ -16,6 +16,7 @@ import java.security.InvalidParameterException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -134,7 +135,6 @@ public class GameService {
     }
 
     public Game gameStatus(Player player) {
-        DatabaseService.getInstance().setRepositories(gameRepository, gamePlayRepository);
         if (GameStorage.getInstance().getGame() == null) {
             return new Game();
         }
@@ -295,4 +295,17 @@ public class GameService {
         return game;
     }
 
+    public GameDb getMatchHistory(String gameId) {
+        DatabaseService databaseService = DatabaseService.getInstance();
+        return databaseService.getMatchHistory(gameId);
+    }
+
+    public List<GameDb> getMatches() {
+        DatabaseService databaseService = DatabaseService.getInstance();
+        return databaseService.getMatches();
+    }
+
+    public void init() {
+        DatabaseService.getInstance().setRepositories(gameRepository, gamePlayRepository);
+    }
 }
