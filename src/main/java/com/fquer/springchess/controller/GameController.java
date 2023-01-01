@@ -65,9 +65,9 @@ public class GameController {
     }
 
     @PostMapping("/getMatchHistory")
-    public GameDb getMatchHistory(@RequestBody Game request) {
+    public GamePlayDb getMatchHistory(@RequestBody GameHistory request) {
         log.info("getMatchHistory request: {}", request);
-        return gameService.getMatchHistory(request.getGameId());
+        return gameService.getMatchHistory(request.getGameId(), request.getMoveOrder());
     }
 
     @GetMapping("/getMatches")

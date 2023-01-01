@@ -295,9 +295,9 @@ public class GameService {
         return game;
     }
 
-    public GameDb getMatchHistory(String gameId) {
+    public GamePlayDb getMatchHistory(String gameId, String moveOrder) {
         DatabaseService databaseService = DatabaseService.getInstance();
-        return databaseService.getMatchHistory(gameId);
+        return databaseService.getMatchHistory(gameId, moveOrder);
     }
 
     public List<GameDb> getMatches() {

@@ -69,7 +69,7 @@ public class DatabaseService {
         return gameList;
     }
 
-    public GameDb getMatchHistory(String gameId) {
-        return gameRepository.findByGameId(gameId);
+    public GamePlayDb getMatchHistory(String gameId, String moveOrder) {
+        return gamePlayRepository.findByGameIdAndMoveOrder(gameId, moveOrder);
     }
 }
