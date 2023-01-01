@@ -25,9 +25,9 @@ public class GameService {
     @Autowired
     private GamePlayRepository gamePlayRepository;
     private GameRepository gameRepository;
-    private final PieceFactory pieceFactory = new PieceFactory();
+    private static final PieceFactory pieceFactory = new PieceFactory();
 
-    private boolean checkStatement(Coordinates coordinate, PieceEnum piece, ColorEnum color){
+    private static boolean checkStatement(Coordinates coordinate, PieceEnum piece, ColorEnum color){
         if (piece == PieceEnum.Pawn && color == ColorEnum.White && Pawn.whiteInitCoordinates.contains(coordinate)){
             return true;
         }
@@ -67,7 +67,7 @@ public class GameService {
         return false;
     }
 
-    private void generatePieces(MapService map){
+    public static void generatePieces(MapService map){
 
         for (Coordinates coordinate: Coordinates.values()){
             for (PieceEnum piece: PieceEnum.values()){
@@ -293,16 +293,6 @@ public class GameService {
         }
         GameStorage.getInstance().setGame(game);
         return game;
-    }
-
-    public GamePlayDb getMatchHistory(String gameId, String moveOrder) {
-        DatabaseService databaseService = DatabaseService.getInstance();
-        return databaseService.getMatchHistory(gameId, moveOrder);
-    }
-
-    public List<GameDb> getMatches() {
-        DatabaseService databaseService = DatabaseService.getInstance();
-        return databaseService.getMatches();
     }
 
     public void init() {

@@ -63,16 +63,4 @@ public class GameController {
         log.info("cancelSelectedCoordinate request: {}", request);
         return ResponseEntity.ok(gameService.cancelSelectedCoordinate(request.getPlayer(), request.getSelectedCoordinate()));
     }
-
-    @PostMapping("/getMatchHistory")
-    public GamePlayDb getMatchHistory(@RequestBody GameHistory request) {
-        log.info("getMatchHistory request: {}", request);
-        return gameService.getMatchHistory(request.getGameId(), request.getMoveOrder());
-    }
-
-    @GetMapping("/getMatches")
-    public List<GameDb> getMatches() {
-        log.info("getMatches request");
-        return gameService.getMatches();
-    }
 }
